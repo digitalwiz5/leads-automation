@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { getLeads, getLeadLogs, query } from '../models/lead';
+import { getLeads, getLeadLogs } from '../models/lead';
+import { query } from '../db';
 
 const router = Router();
 
