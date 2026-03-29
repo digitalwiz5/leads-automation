@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>טופס לידים - דוגמה</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; }
+    input, button { display: block; width: 100%; margin: 8px 0; padding: 10px; font-size: 16px; }
+    button { background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
+    #msg { padding: 10px; border-radius: 4px; display: none; }
+    .success { background: #d4edda; color: #155724; }
+    .error   { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <h2>השאירו פרטים ונחזור אליכם</h2>
+
+  <form id="leadForm">
+    <input type="text"  name="name"   placeholder="שם מלא"    required />
+    <input type="tel"   name="phone"  placeholder="טלפון"      />
+    <input type="email" name="email"  placeholder="אימייל"     />
+    <button type="submit">שלח</button>
+  </form>
+
+  <div id="msg"></div>
+
+  <script>
+    const WEBHOOK_URL = 'https://your-app.railway.app/webhook/lead?token=YOUR_SECRET_TOKEN';
+
+    document.getElementById('leadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const msg  = document.getElementById('msg');
+
+      const body = {
+        name:   form.name.value,
+        phone:  form.phone.value,
+        email:  form.email.value,
+        source: 'website-form',
+      };
+
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+
+        msg.style.display = 'block';
+        if (res.ok) {
+          msg.className = 'success';
+          msg.textContent = 'תודה! נחזור אליך בהקדם.';
+          form.reset();
+        } else {
+          msg.className = 'error';
+          msg.textContent = 'שגיאה: ' + (data.error || 'נסה שנית');
+        }
+      } catch {
+        msg.style.display = 'block';
+        msg.className = 'error';
+        msg.textContent = 'שגיאת רשת, נסה שנית.';
+      }
+    });
+  </script>
+</body>
+</html>
